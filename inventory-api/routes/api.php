@@ -17,35 +17,3 @@ Route::prefix('auth')->group(function () {
         Route::apiResource('users', UserController::class);
     });
 });
-
-Route::get('/test-error', function () {
-    abort(404, 'Test resource not found.');
-});
-
-Route::get('/test-exception', function () {
-    throw new InsufficientStockException(
-        available: 5,
-        requested: 10,
-    );
-});
-
-Route::post('/test-validation', function (Request $request) {
-    $validated = $request->validate([
-        'name' => ['required', 'string'],
-        'quantity' => ['required', 'integer', 'min:1'],
-    ]);
-
-    return response()->json([
-        'data' => $validated,
-    ]);
-});
-
-Route::middleware('auth:sanctum')->get('/test-forbidden', function () {
-    Gate::authorize('test-permission');
-
-    return response()->json([
-        'data' => [
-            'message' => 'You have permission.',
-        ],
-    ]);
-});
