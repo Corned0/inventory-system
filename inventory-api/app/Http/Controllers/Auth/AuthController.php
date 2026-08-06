@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
@@ -14,10 +15,14 @@ class AuthController extends Controller
     {
         $credentials = $request->validated();
 
-        if (! Auth::attempt($credentials)) {
+        if (! Auth::attempt([
+            'username' => $credentials['username'],
+            'password' => $credentials['password'],
+            'is_active' => true,
+        ])) {
             return response()->json([
-                'message' => 'Invalid credentials.',
-            ], Response::HTTP_UNAUTHORIZED);
+                'message' => 'Invalid username or password.',
+            ], 401);
         }
 
         /** @var \App\Models\User $user */
@@ -27,9 +32,10 @@ class AuthController extends Controller
 
         return response()->json([
             'data' => [
-                'user' => $user,
+                'user' => new UserResource($user),
                 'token' => $token,
             ],
+            'message' => 'Login successful.',
         ]);
     }
 
