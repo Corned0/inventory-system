@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             AdminUserSeeder::class,
             UnitOfMeasureSeeder::class,
+            ItemCategorySeeder::class,
         ]);
     }
 }
