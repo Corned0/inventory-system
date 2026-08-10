@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Permission;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -32,4 +34,39 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /* public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->relationLoaded('permissions')
+            ? $this->permissions->contains('name', $permission)
+            : $this->permissions()
+                ->where('name', $permission)
+                ->exists();
+    }
+
+    public function givePermission(string $permission): void
+    {
+        $permission = Permission::where('name', $permission)
+            ->firstOrFail();
+
+        $this->permissions()
+            ->syncWithoutDetaching([$permission->id]);
+    }
+
+    public function revokePermission(string $permission): void
+    {
+        $permission = Permission::where('name', $permission)
+            ->first();
+
+        if ($permission === null) {
+            return;
+        }
+
+        $this->permissions()->detach($permission->id);
+    } */
 }
