@@ -11,27 +11,11 @@
 9. Item Types - 
 10. Items
 
-/api/v1
-│
-├── auth
-│ ├── POST /login
-│ └── POST /logout
-│
-├── users
-│ ├── GET /
-│ ├── GET /{user}
-│ ├── POST /
-│ ├── PATCH /{user}
-│ └── ...
-│
-├── roles
-│ ├── GET /
-│ ├── POST /
-│ ├── PATCH /{role}
-│ └── ...
-│
-├── permissions
-│ └── GET /
-│
-└── inventory
-└── ...
+Yes. For your inventory architecture, I would implement this as four models + four tables, with ItemAttributeValue deferred until the actual Item model exists.
+
+The important distinction is:
+
+AttributeDefinition = defines what a field is.
+AttributeOption = values available for select / multiselect.
+ItemTypeAttribute = assigns an attribute to an item type.
+ItemAttributeValue = stores the actual value for a specific inventory item.

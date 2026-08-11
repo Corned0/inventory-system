@@ -6,6 +6,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Inventory\UnitOfMeasureController;
 use App\Http\Controllers\Inventory\ItemCategoryController;
 use App\Http\Controllers\Inventory\ItemTypeController;
+use App\Http\Controllers\Inventory\AttributeDefinitionController;
+use App\Http\Controllers\Inventory\AttributeOptionController;
+use App\Http\Controllers\Inventory\ItemTypeAttributeController;
+use App\Http\Controllers\Inventory\ItemTypeMetadataController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -28,6 +32,24 @@ Route::prefix('auth')->group(function () {
             Route::apiResource('item-types', ItemTypeController::class)->parameters(['item-types' => 'itemType',])->only(['index','store','show','update',]);
             Route::post('item-types/{itemType}/activate',[ItemTypeController::class, 'activate'])->name('item-types.activate');
             Route::post('item-types/{itemType}/deactivate',[ItemTypeController::class, 'deactivate'])->name('item-types.deactivate');
+
+            Route::get('item-types/{itemType}/attributes/metadata',[ItemTypeMetadataController::class, 'show'])->name('item-types.attributes.metadata');
+            Route::get('item-types/{itemType}/attributes',[ItemTypeAttributeController::class, 'index'])->name('item-type-attributes.index');
+            Route::post('item-types/{itemType}/attributes',[ItemTypeAttributeController::class, 'store'])->name('item-type-attributes.store');
+            Route::patch('item-types/{itemType}/attributes/{itemTypeAttribute}',[ItemTypeAttributeController::class, 'update'])->name('item-type-attributes.update');
+            Route::delete('item-types/{itemType}/attributes/{itemTypeAttribute}',[ItemTypeAttributeController::class, 'destroy'])->name('item-type-attributes.destroy');
+
+            Route::apiResource('attributes', AttributeDefinitionController::class)->only(['index','store','show','update',]);
+            Route::post('attributes/{attribute}/activate',[AttributeDefinitionController::class, 'activate'])->name('attributes.activate');
+            Route::post('attributes/{attribute}/deactivate',[AttributeDefinitionController::class, 'deactivate'])->name('attributes.deactivate');
+
+            Route::get('attributes/{attribute}/options',[AttributeOptionController::class, 'index'])->name('attribute-options.index');
+            Route::post('attributes/{attribute}/options',[AttributeOptionController::class, 'store'])->name('attribute-options.store');
+            Route::apiResource('attribute-options', AttributeOptionController::class)->only(['show','update','destroy'])->parameters(['attribute-options' => 'option',]);
+            Route::post('attribute-options/{option}/activate',[AttributeOptionController::class, 'activate'])->name('attribute-options.activate');
+            Route::post('attribute-options/{option}/deactivate',[AttributeOptionController::class, 'deactivate'])->name('attribute-options.deactivate');
+
+            
         });
         
     });
