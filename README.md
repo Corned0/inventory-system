@@ -8,7 +8,7 @@
 6. HRMIS integration client
 7. Units -
 8. Categories -
-9. Item Types
+9. Item Types - 
 10. Items
 
 /api/v1

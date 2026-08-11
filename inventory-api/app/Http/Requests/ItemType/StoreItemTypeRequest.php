@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\ItemType;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateUserRequest extends FormRequest
+class StoreItemTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,32 +23,37 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('user');
-
         return [
+            'code' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:item_types,code',
+            ],
             'name' => [
-                'sometimes',
+                'required',
                 'string',
-                'max:200',
-                Rule::unique('users', 'name')->ignore($userId),
+                'max:255',
             ],
-            'username' => [
-                'sometimes',
-                'string',
-                'max:100',
-                Rule::unique('users', 'username')->ignore($userId),
-            ],
-            'employee_id' => [
-                'sometimes',
-                'integer',
-                Rule::unique('users', 'employee_id')->ignore($userId),
-            ],
-            'password' => [
-                'sometimes',
+            'description' => [
                 'nullable',
                 'string',
-                'min:8',
-                'max:255',
+            ],
+            'tracking_type' => [
+                'required',
+                Rule::in([
+                    'none',
+                    'lot',
+                    'serial',
+                ]),
+            ],
+            'is_asset' => [
+                'sometimes',
+                'boolean',
+            ],
+            'is_composite' => [
+                'sometimes',
+                'boolean',
             ],
             'is_active' => [
                 'sometimes',

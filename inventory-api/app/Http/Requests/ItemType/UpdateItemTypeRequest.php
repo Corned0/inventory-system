@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\ItemType;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateUserRequest extends FormRequest
+class UpdateItemTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,32 +23,41 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('user');
+        $itemType = $this->route('itemType');
 
         return [
+            'code' => [
+                'sometimes',
+                'string',
+                'max:50',
+                Rule::unique('item_types', 'code')
+                    ->ignore($itemType->id),
+            ],
             'name' => [
                 'sometimes',
                 'string',
-                'max:200',
-                Rule::unique('users', 'name')->ignore($userId),
+                'max:255',
             ],
-            'username' => [
-                'sometimes',
-                'string',
-                'max:100',
-                Rule::unique('users', 'username')->ignore($userId),
-            ],
-            'employee_id' => [
-                'sometimes',
-                'integer',
-                Rule::unique('users', 'employee_id')->ignore($userId),
-            ],
-            'password' => [
+            'description' => [
                 'sometimes',
                 'nullable',
                 'string',
-                'min:8',
-                'max:255',
+            ],
+            'tracking_type' => [
+                'sometimes',
+                Rule::in([
+                    'none',
+                    'lot',
+                    'serial',
+                ]),
+            ],
+            'is_asset' => [
+                'sometimes',
+                'boolean',
+            ],
+            'is_composite' => [
+                'sometimes',
+                'boolean',
             ],
             'is_active' => [
                 'sometimes',
