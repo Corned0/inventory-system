@@ -11,6 +11,7 @@ use App\Http\Controllers\Inventory\AttributeOptionController;
 use App\Http\Controllers\Inventory\ItemTypeAttributeController;
 use App\Http\Controllers\Inventory\ItemTypeMetadataController;
 use App\Http\Controllers\Inventory\ItemController;
+use App\Http\Controllers\Inventory\WarehouseController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -56,6 +57,8 @@ Route::prefix('auth')->group(function () {
             Route::post('items/{item}/deactivate',[ItemController::class, 'deactivate'])->name('items.deactivate');
             Route::get('items/{item}/attributes',[ItemController::class, 'getAttributes'])->name('items.attributes');
             Route::patch('items/{item}/attributes',[ItemController::class, 'updateAttributes'])->name('items.attributes.update');
+
+            Route::apiResource('warehouses', WarehouseController::class)->only(['index','store','show','update',]);
         });
                     
     });
