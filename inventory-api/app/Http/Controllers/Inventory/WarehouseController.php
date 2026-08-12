@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Warehouse\StoreWarehouseRequest;
 use App\Http\Requests\Warehouse\UpdateWarehouseRequest;
 use App\Http\Resources\WarehouseResource;
+use App\Http\Resources\LocationTreeResource;
 use App\Models\Warehouse;
 use Illuminate\Http\JsonResponse;
 
 class WarehouseController extends Controller
 {
+
     public function index(): JsonResponse
     {
         $warehouses = Warehouse::query()

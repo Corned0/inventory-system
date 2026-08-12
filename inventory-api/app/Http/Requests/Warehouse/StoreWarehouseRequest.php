@@ -16,6 +16,15 @@ class StoreWarehouseRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('is_active')) {
+            $this->merge([
+                'is_active' => true,
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -29,7 +38,7 @@ class StoreWarehouseRequest extends FormRequest
                 'string',
                 'max:50',
                 'alpha_dash',
-                Rule::unique('warehouses', 'code'),
+                'unique:warehouses,code',
             ],
             'name' => [
                 'required',

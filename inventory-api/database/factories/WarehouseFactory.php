@@ -26,11 +26,4 @@ class WarehouseFactory extends Factory
             'is_active' => true,
         ];
     }
-
-    public function inactive(): static
-    {
-        return $this->state(fn () => [
-            'is_active' => false,
-        ]);
-    }
 }

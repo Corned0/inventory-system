@@ -12,6 +12,7 @@ use App\Http\Controllers\Inventory\ItemTypeAttributeController;
 use App\Http\Controllers\Inventory\ItemTypeMetadataController;
 use App\Http\Controllers\Inventory\ItemController;
 use App\Http\Controllers\Inventory\WarehouseController;
+use App\Http\Controllers\Inventory\LocationController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -59,6 +60,9 @@ Route::prefix('auth')->group(function () {
             Route::patch('items/{item}/attributes',[ItemController::class, 'updateAttributes'])->name('items.attributes.update');
 
             Route::apiResource('warehouses', WarehouseController::class)->only(['index','store','show','update',]);
+            Route::get('warehouses/{warehouse}/locations/tree',[LocationController::class, 'tree'],)->name('warehouses.locations.tree');
+            Route::apiResource('locations', LocationController::class)->only(['index','store','show','update',]);
+            
         });
                     
     });
