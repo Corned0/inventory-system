@@ -51,4 +51,9 @@ class ItemCategory extends Model
 
         return false;
     }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class, 'category_id');
+    }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventory\AttributeDefinitionController;
 use App\Http\Controllers\Inventory\AttributeOptionController;
 use App\Http\Controllers\Inventory\ItemTypeAttributeController;
 use App\Http\Controllers\Inventory\ItemTypeMetadataController;
+use App\Http\Controllers\Inventory\ItemController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -49,8 +50,13 @@ Route::prefix('auth')->group(function () {
             Route::post('attribute-options/{option}/activate',[AttributeOptionController::class, 'activate'])->name('attribute-options.activate');
             Route::post('attribute-options/{option}/deactivate',[AttributeOptionController::class, 'deactivate'])->name('attribute-options.deactivate');
 
-            
+            Route::apiResource('items', ItemController::class);
+            Route::post('items/{item}/restore',[ItemController::class, 'restore'])->withTrashed()->name('items.restore');
+            Route::post('items/{item}/activate',[ItemController::class, 'activate'])->name('items.activate');
+            Route::post('items/{item}/deactivate',[ItemController::class, 'deactivate'])->name('items.deactivate');
+            Route::get('items/{item}/attributes',[ItemController::class, 'getAttributes'])->name('items.attributes');
+            Route::patch('items/{item}/attributes',[ItemController::class, 'updateAttributes'])->name('items.attributes.update');
         });
-        
+                    
     });
 });
