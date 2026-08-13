@@ -5,8 +5,8 @@ namespace App\Exceptions;
 class InsufficientStockException extends BusinessException
 {
     public function __construct(
-        public readonly int $available,
-        public readonly int $requested,
+        public readonly string|float $available,
+        public readonly string|float $requested,
     ) {
         parent::__construct(
             message: 'Insufficient stock.',

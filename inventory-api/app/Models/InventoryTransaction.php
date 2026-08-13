@@ -2,30 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\InventoryTransactionType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class InventoryTransaction extends Model
 {
     use HasFactory;
 
     public const UPDATED_AT = null;
-
-    public const TYPES = [
-        'receipt',
-        'put_away',
-        'issue',
-        'transfer_out',
-        'transfer_in',
-        'return',
-        'adjustment_in',
-        'adjustment_out',
-        'disposal',
-        'assembly',
-        'disassembly',
-        'stock_count',
-    ];
 
     protected $fillable = [
         'transaction_number',
@@ -47,6 +33,7 @@ class InventoryTransaction extends Model
     protected function casts(): array
     {
         return [
+            'transaction_type' => InventoryTransactionType::class,
             'quantity' => 'decimal:4',
             'unit_cost' => 'decimal:4',
             'transaction_date' => 'datetime',
@@ -70,16 +57,25 @@ class InventoryTransaction extends Model
 
     public function lot(): BelongsTo
     {
-        return $this->belongsTo(InventoryLot::class);
+        return $this->belongsTo(
+            InventoryLot::class,
+            'lot_id'
+        );
     }
 
     public function serial(): BelongsTo
     {
-        return $this->belongsTo(InventorySerial::class);
+        return $this->belongsTo(
+            InventorySerial::class,
+            'serial_id'
+        );
     }
 
     public function performedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'performed_by');
+        return $this->belongsTo(
+            User::class,
+            'performed_by'
+        );
     }
 }

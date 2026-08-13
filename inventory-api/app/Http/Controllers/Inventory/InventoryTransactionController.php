@@ -7,11 +7,18 @@ use App\Http\Requests\InventoryTransaction\IndexInventoryTransactionRequest;
 use App\Http\Requests\InventoryTransaction\StoreInventoryTransactionRequest;
 use App\Http\Resources\InventoryTransactionResource;
 use App\Models\InventoryTransaction;
-use Illuminate\Http\JsonResponse;
+use App\Services\Inventory\InventoryBalanceService;
 use App\Services\Inventory\InventoryTransactionNumberGenerator;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class InventoryTransactionController extends Controller
 {
+    public function __construct(
+        private readonly InventoryBalanceService $balanceService,
+        private readonly InventoryTransactionNumberGenerator $numberGenerator,
+    ) {}
+
     public function index(IndexInventoryTransactionRequest $request): JsonResponse
     {
         $filters = $request->validated();
@@ -64,23 +71,32 @@ class InventoryTransactionController extends Controller
     ): JsonResponse {
         $data = $request->validated();
 
-        $data['transaction_number'] = app(InventoryTransactionNumberGenerator::class)->generate();
-        $data['transaction_date'] ??= now();
+        $transaction = DB::transaction(function () use ($data) {
+            $data['transaction_number'] =
+                $this->numberGenerator->generate();
 
-        $data['performed_by'] = auth()->id();
+            $data['transaction_date'] ??= now();
+            $data['performed_by'] = auth()->id();
 
-        $transaction = InventoryTransaction::create($data);
+            $transaction = InventoryTransaction::create($data);
+
+            $this->balanceService->apply($transaction);
+
+            return $transaction;
+        });
+
+        $transaction->load([
+            'item',
+            'warehouse',
+            'location',
+            'lot',
+            'serial',
+            'performedBy',
+        ]);
 
         return response()->json([
             'data' => new InventoryTransactionResource(
-                $transaction->load([
-                    'item',
-                    'warehouse',
-                    'location',
-                    'lot',
-                    'serial',
-                    'performedBy',
-                ])
+                $transaction
             ),
             'message' => 'Inventory transaction created successfully.',
         ], 201);

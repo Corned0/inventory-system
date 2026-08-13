@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\InventoryTransaction;
 
-use App\Models\InventoryTransaction;
+use App\Enums\InventoryTransactionType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -28,7 +28,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'transaction_type' => [
                 'required',
                 'string',
-                Rule::in(InventoryTransaction::TYPES),
+                Rule::enum(InventoryTransactionType::class),
             ],
 
             'item_id' => [
@@ -92,6 +92,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'remarks' => [
                 'nullable',
                 'string',
+                'max:1000',
             ],
         ];
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\InventoryTransactionType;
 use App\Models\InventoryTransaction;
 use App\Models\Item;
 use App\Models\Warehouse;
@@ -26,7 +27,7 @@ it('creates a receipt transaction', function () {
     $response = $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
@@ -38,7 +39,10 @@ it('creates a receipt transaction', function () {
 
     $response
         ->assertCreated()
-        ->assertJsonPath('data.transaction_type', 'receipt')
+        ->assertJsonPath(
+            'data.transaction_type',
+            InventoryTransactionType::Receipt->value
+        )
         ->assertJsonPath('data.item_id', $item->id)
         ->assertJsonPath('data.warehouse_id', $warehouse->id)
         ->assertJsonPath('data.quantity', '10.0000')
@@ -48,7 +52,7 @@ it('creates a receipt transaction', function () {
     expect(InventoryTransaction::query()->count())
         ->toBe(1);
 });
-
+ 
 it('generates the transaction number automatically', function () {
     $item = Item::factory()->create();
     $warehouse = Warehouse::factory()->create();
@@ -56,7 +60,7 @@ it('generates the transaction number automatically', function () {
     $response = $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
@@ -79,7 +83,7 @@ it('does not allow the client to choose the transaction number', function () {
         route('inventory-transactions.store'),
         [
             'transaction_number' => 'HACK-999999',
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
@@ -99,7 +103,7 @@ it('generates sequential transaction numbers', function () {
     $warehouse = Warehouse::factory()->create();
 
     $payload = [
-        'transaction_type' => 'receipt',
+        'transaction_type' => InventoryTransactionType::Receipt->value,
         'item_id' => $item->id,
         'warehouse_id' => $warehouse->id,
         'quantity' => 10,
@@ -137,7 +141,7 @@ it('records the authenticated user as the performer', function () {
     $response = $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
@@ -191,7 +195,7 @@ it('requires an item', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
         ]
@@ -206,7 +210,7 @@ it('requires an existing item', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => 999999,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
@@ -222,7 +226,7 @@ it('requires a warehouse', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'quantity' => 10,
         ]
@@ -237,7 +241,7 @@ it('requires an existing warehouse', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => 999999,
             'quantity' => 10,
@@ -254,7 +258,7 @@ it('requires a positive quantity', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => 0,
@@ -271,7 +275,7 @@ it('rejects a negative quantity', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => -5,
@@ -288,7 +292,7 @@ it('accepts an optional unit cost', function () {
     $this->postJson(
         route('inventory-transactions.store'),
         [
-            'transaction_type' => 'receipt',
+            'transaction_type' => InventoryTransactionType::Receipt->value,
             'item_id' => $item->id,
             'warehouse_id' => $warehouse->id,
             'quantity' => 10,
@@ -297,4 +301,29 @@ it('accepts an optional unit cost', function () {
     )
         ->assertCreated()
         ->assertJsonPath('data.unit_cost', '1250.5000');
-});
+}); 
+
+
+/* it('accepts every transaction type defined by the enum', function (
+    InventoryTransactionType $transactionType
+) {
+    $item = Item::factory()->create();
+    $warehouse = Warehouse::factory()->create();
+
+    $this->postJson(
+        route('inventory-transactions.store'),
+        [
+            'transaction_type' => $transactionType->value,
+            'item_id' => $item->id,
+            'warehouse_id' => $warehouse->id,
+            'quantity' => 10,
+        ]
+    )
+        ->assertCreated()
+        ->assertJsonPath(
+            'data.transaction_type',
+            $transactionType->value
+        );
+})->with(
+    InventoryTransactionType::cases()
+); */
