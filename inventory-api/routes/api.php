@@ -14,6 +14,9 @@ use App\Http\Controllers\Inventory\ItemController;
 use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Inventory\LocationController;
 use App\Http\Controllers\Inventory\SupplierController;
+use App\Http\Controllers\Inventory\InventoryTransactionController;
+use App\Http\Controllers\Inventory\InventoryLotController;
+use App\Http\Controllers\Inventory\InventorySerialController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -66,6 +69,11 @@ Route::prefix('auth')->group(function () {
 
             Route::apiResource('suppliers', SupplierController::class)->only(['index','store','show','update',]);
             
+            Route::apiResource('inventory-transactions',InventoryTransactionController::class)->only(['index','store','show',]);
+
+            Route::apiResource('inventory-lots', InventoryLotController::class)->parameters(['lots' => 'inventoryLot',])->only(['index','store','show','update',]);
+
+            Route::apiResource('inventory-serials', InventorySerialController::class)->parameters(['serials' => 'inventorySerial', ])->only(['index','store','show','update',]);
         });
                     
     });

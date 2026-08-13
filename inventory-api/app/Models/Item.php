@@ -54,4 +54,14 @@ class Item extends Model
     {
         return $this->hasMany(ItemAttributeValue::class);
     }
+
+    public function inventoryLots(): HasMany
+    {
+        return $this->hasMany(InventoryLot::class);
+    }
+
+    public function inventorySerials(): HasMany
+    {
+        return $this->hasMany(InventorySerial::class);
+    }
 }
