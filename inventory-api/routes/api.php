@@ -13,6 +13,7 @@ use App\Http\Controllers\Inventory\ItemTypeMetadataController;
 use App\Http\Controllers\Inventory\ItemController;
 use App\Http\Controllers\Inventory\WarehouseController;
 use App\Http\Controllers\Inventory\LocationController;
+use App\Http\Controllers\Inventory\SupplierController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -62,6 +63,8 @@ Route::prefix('auth')->group(function () {
             Route::apiResource('warehouses', WarehouseController::class)->only(['index','store','show','update',]);
             Route::get('warehouses/{warehouse}/locations/tree',[LocationController::class, 'tree'],)->name('warehouses.locations.tree');
             Route::apiResource('locations', LocationController::class)->only(['index','store','show','update',]);
+
+            Route::apiResource('suppliers', SupplierController::class)->only(['index','store','show','update',]);
             
         });
                     
