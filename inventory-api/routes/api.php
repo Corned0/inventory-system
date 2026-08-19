@@ -17,6 +17,7 @@ use App\Http\Controllers\Inventory\SupplierController;
 use App\Http\Controllers\Inventory\InventoryTransactionController;
 use App\Http\Controllers\Inventory\InventoryLotController;
 use App\Http\Controllers\Inventory\InventorySerialController;
+use App\Http\Controllers\Inventory\ReceivingController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -74,6 +75,15 @@ Route::prefix('auth')->group(function () {
             Route::apiResource('inventory-lots', InventoryLotController::class)->parameters(['lots' => 'inventoryLot',])->only(['index','store','show','update',]);
 
             Route::apiResource('inventory-serials', InventorySerialController::class)->parameters(['serials' => 'inventorySerial', ])->only(['index','store','show','update',]);
+
+            Route::get('receivings',[ReceivingController::class, 'index'])->name('receivings.index');
+            Route::get('receivings/{receiving}',[ReceivingController::class, 'show'])->name('receivings.show');
+            Route::post('receivings',[ReceivingController::class, 'store'])->name('receivings.store');
+            Route::post('receivings/{receiving}/receive',[ReceivingController::class, 'receive'])->name('receivings.receive');
+            Route::post('receivings/{receiving}/inspect',[ReceivingController::class, 'inspect'])->name('receivings.inspect');
+            Route::post('receivings/{receiving}/accept',[ReceivingController::class, 'accept'])->name('receivings.accept');
+            Route::post('receivings/{receiving}/reject',[ReceivingController::class, 'reject'])->name('receivings.reject');
+            Route::post('receivings/{receiving}/complete',[ReceivingController::class, 'complete'])->name('receivings.complete');
         });
                     
     });
