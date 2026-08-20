@@ -76,9 +76,7 @@ Route::prefix('auth')->group(function () {
 
             Route::apiResource('inventory-serials', InventorySerialController::class)->parameters(['serials' => 'inventorySerial', ])->only(['index','store','show','update',]);
 
-            Route::get('receivings',[ReceivingController::class, 'index'])->name('receivings.index');
-            Route::get('receivings/{receiving}',[ReceivingController::class, 'show'])->name('receivings.show');
-            Route::post('receivings',[ReceivingController::class, 'store'])->name('receivings.store');
+            Route::apiResource('receivings',ReceivingController::class)->only(['index','store','show','update',]);
             Route::post('receivings/{receiving}/receive',[ReceivingController::class, 'receive'])->name('receivings.receive');
             Route::post('receivings/{receiving}/inspect',[ReceivingController::class, 'inspect'])->name('receivings.inspect');
             Route::post('receivings/{receiving}/accept',[ReceivingController::class, 'accept'])->name('receivings.accept');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Receiving\StoreReceivingRequest;
+use App\Http\Requests\Receiving\UpdateReceivingRequest;
 use App\Http\Resources\ReceivingResource;
 use App\Models\Receiving;
 use App\Services\Receiving\ReceivingService;
@@ -53,6 +54,21 @@ class ReceivingController extends Controller
             'data' => new ReceivingResource($receiving),
             'message' => 'Receiving created successfully.',
         ], 201);
+    }
+
+    public function update(
+        UpdateReceivingRequest $request,
+        Receiving $receiving
+    ): JsonResponse {
+        $receiving = $this->receivingService->update(
+            $receiving,
+            $request->validated()
+        );
+
+        return $this->success(
+            $receiving,
+            'Receiving updated successfully.'
+        );
     }
 
     public function show(

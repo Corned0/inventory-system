@@ -54,6 +54,55 @@ class ReceivingService
         ]);
     }
 
+    public function update(
+        Receiving $receiving,
+        array $data
+    ): Receiving {
+        if ($receiving->status !== ReceivingStatus::Draft) {
+            throw new InvalidReceivingStatusException(
+                current: $receiving->status,
+                expected: ReceivingStatus::Draft,
+            );
+        }
+
+        return DB::transaction(function () use (
+            $receiving,
+            $data
+        ): Receiving {
+            $items = $data['items'] ?? null;
+
+            unset($data['items']);
+
+            if ($data !== []) {
+                $receiving->update($data);
+            }
+
+            if ($items !== null) {
+                $receiving->items()->delete();
+
+                foreach ($items as $item) {
+                    $receiving->items()->create([
+                        'item_id' => $item['item_id'],
+                        'ordered_quantity' => $item['ordered_quantity'],
+                        'received_quantity' => $item['received_quantity'],
+                        'accepted_quantity' => 0,
+                        'rejected_quantity' => 0,
+                        'unit_cost' => $item['unit_cost'] ?? null,
+                    ]);
+                }
+            }
+
+            return $receiving->load([
+                'supplier',
+                'warehouse',
+                'receivedBy',
+                'items.item',
+                'items.lots.lot',
+                'items.serials.serial',
+            ]);
+        });
+    }
+
     public function markReceived(
         Receiving $receiving
     ): Receiving {
