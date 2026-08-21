@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -13,9 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement(
-            "CREATE SEQUENCE IF NOT EXISTS receiving_number_sequence
-            START 1
-            INCREMENT 1"
+            'CREATE SEQUENCE IF NOT EXISTS put_away_number_sequence START 1'
         );
     }
 
@@ -25,7 +21,7 @@ return new class extends Migration
     public function down(): void
     {
         DB::statement(
-            "DROP SEQUENCE IF EXISTS receiving_number_sequence"
+            'DROP SEQUENCE IF EXISTS put_away_number_sequence'
         );
     }
 };

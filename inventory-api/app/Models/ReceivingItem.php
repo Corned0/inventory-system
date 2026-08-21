@@ -51,4 +51,11 @@ class ReceivingItem extends Model
     {
         return $this->hasMany(ReceivingItemSerial::class);
     }
+
+    public function putAwayItems(): HasMany
+    {
+        return $this->hasMany(
+            PutAwayItem::class
+        );
+    }
 }

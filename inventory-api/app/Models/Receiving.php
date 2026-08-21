@@ -56,4 +56,9 @@ class Receiving extends Model
     {
         return $this->hasMany(ReceivingItem::class);
     }
+
+    public function putAways(): HasMany
+    {
+        return $this->hasMany(PutAway::class);
+    }
 }

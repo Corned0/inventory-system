@@ -18,6 +18,7 @@ use App\Http\Controllers\Inventory\InventoryTransactionController;
 use App\Http\Controllers\Inventory\InventoryLotController;
 use App\Http\Controllers\Inventory\InventorySerialController;
 use App\Http\Controllers\Inventory\ReceivingController;
+use App\Http\Controllers\Inventory\PutAwayController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -82,6 +83,10 @@ Route::prefix('auth')->group(function () {
             Route::post('receivings/{receiving}/accept',[ReceivingController::class, 'accept'])->name('receivings.accept');
             Route::post('receivings/{receiving}/reject',[ReceivingController::class, 'reject'])->name('receivings.reject');
             Route::post('receivings/{receiving}/complete',[ReceivingController::class, 'complete'])->name('receivings.complete');
+
+            Route::post('inventory/receivings/{receiving}/put-away',[PutAwayController::class, 'store'] )->name('receivings.put-away');
+            Route::get('inventory/put-aways/{putAway}',[PutAwayController::class, 'show'])->name('put-aways.show');
+            Route::post('inventory/put-aways/{putAway}/complete',[PutAwayController::class, 'complete'])->name('put-aways.complete');
         });
                     
     });
