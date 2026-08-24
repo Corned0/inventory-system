@@ -20,6 +20,7 @@ use App\Http\Controllers\Inventory\InventorySerialController;
 use App\Http\Controllers\Inventory\ReceivingController;
 use App\Http\Controllers\Inventory\PutAwayController;
 use App\Http\Controllers\Inventory\AssetInstanceController;
+use App\Http\Controllers\Inventory\ItemBomController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -90,6 +91,14 @@ Route::prefix('auth')->group(function () {
             Route::post('put-aways/{putAway}/complete',[PutAwayController::class, 'complete'])->name('put-aways.complete');
 
             Route::apiResource('asset-instances',AssetInstanceController::class)->only(['index','store','show','update',])->parameters(['asset-instances' => 'assetInstance',]);
+            
+            Route::get('items/{item}/boms',[ItemBomController::class, 'index'])->name('item-boms.index');
+            Route::post('items/{item}/boms',[ItemBomController::class, 'store'])->name('item-boms.store');
+            Route::get('boms/{bom}',[ItemBomController::class, 'show'])->name('item-boms.show');
+            Route::patch('boms/{bom}',[ItemBomController::class, 'update'])->name('item-boms.update');
+            Route::post('boms/{bom}/components',[ItemBomController::class, 'storeComponent'])->name('item-bom-components.store');
+            Route::patch('boms/{bom}/components/{component}',[ItemBomController::class, 'updateComponent'])->name('item-bom-components.update');
+            Route::delete('boms/{bom}/components/{component}',[ItemBomController::class, 'destroyComponent'])->name('item-bom-components.destroy');
         });
                     
     });

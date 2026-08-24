@@ -64,4 +64,9 @@ class Item extends Model
     {
         return $this->hasMany(InventorySerial::class);
     }
+
+    public function boms(): HasMany
+    {
+        return $this->hasMany(ItemBom::class);
+    }
 }

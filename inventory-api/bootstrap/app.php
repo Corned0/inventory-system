@@ -74,7 +74,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // 500 / other exceptions
-        $exceptions->render(function (
+        /* $exceptions->render(function (
             \Throwable $e,
             Request $request
         ) {
@@ -91,6 +91,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     ? 'An unexpected error occurred.'
                     : $e->getMessage(),
             ], $status);
-        });
+        }); */
     })
     ->create();

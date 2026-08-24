@@ -1,4 +1,4 @@
-next: # 18. Phase 15 — Asset Instances
+next: # Phase 17 — Actual Component Assembly
 
 EVENT FLOW:
     Receiving
