@@ -25,8 +25,8 @@ class InventoryLotResource extends JsonResource
                 $this->whenLoaded('item')
             ),
 
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

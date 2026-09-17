@@ -18,6 +18,16 @@ class InventoryLot extends Model
         'expiration_date',
     ];
 
+    public function transactions()
+    {
+        return $this->hasMany(InventoryTransaction::class, 'lot_id');
+    }
+
+    public function balances()
+    {
+        return $this->hasMany(InventoryBalance::class, 'lot_id');
+    }
+
     protected function casts(): array
     {
         return [

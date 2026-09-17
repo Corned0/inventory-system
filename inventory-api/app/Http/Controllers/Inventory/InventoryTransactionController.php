@@ -7,7 +7,9 @@ use App\Http\Requests\InventoryTransaction\IndexInventoryTransactionRequest;
 use App\Http\Requests\InventoryTransaction\StoreInventoryTransactionRequest;
 use App\Http\Resources\InventoryTransactionResource;
 use App\Models\InventoryTransaction;
+use App\Models\Item;
 use App\Services\Inventory\InventoryBalanceService;
+use App\Services\Inventory\InventoryTrackingService;
 use App\Services\Inventory\InventoryTransactionNumberGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +19,7 @@ class InventoryTransactionController extends Controller
     public function __construct(
         private readonly InventoryBalanceService $balanceService,
         private readonly InventoryTransactionNumberGenerator $numberGenerator,
+        private readonly InventoryTrackingService $trackingService,
     ) {}
 
     public function index(IndexInventoryTransactionRequest $request): JsonResponse
@@ -72,6 +75,17 @@ class InventoryTransactionController extends Controller
         $data = $request->validated();
 
         $transaction = DB::transaction(function () use ($data) {
+            $item = Item::query()->with('itemType')->findOrFail($data['item_id']);
+
+            $this->trackingService->validateForTransaction(
+                item: $item,
+                lotId: $data['lot_id'] ?? null,
+                serialId: $data['serial_id'] ?? null,
+                quantity: $data['quantity'] ?? null,
+                warehouseId: $data['warehouse_id'] ?? null,
+                locationId: $data['location_id'] ?? null,
+            );
+
             $data['transaction_number'] =
                 $this->numberGenerator->generate();
 

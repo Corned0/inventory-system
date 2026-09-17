@@ -65,15 +65,12 @@ class ItemBomService
         ItemBom $bom,
         array $data
     ): ItemBomComponent {
-        if (
-            (int) $data['component_item_id'] ===
-            (int) $bom->item_id
-        ) {
-            throw new BomCircularReferenceException();
-        }
+        $componentItemId = (int) $data['component_item_id'];
+
+        $this->assertComponentIsValid($bom, $componentItemId, null);
 
         return $bom->components()->create([
-            'component_item_id' => $data['component_item_id'],
+            'component_item_id' => $componentItemId,
             'quantity' => $data['quantity'],
             'is_required' => $data['is_required'] ?? true,
         ]);
@@ -83,13 +80,14 @@ class ItemBomService
         ItemBomComponent $component,
         array $data
     ): ItemBomComponent {
-        if (
-            isset($data['component_item_id']) &&
-            (int) $data['component_item_id'] ===
-            (int) $component->bom->item_id
-        ) {
-            throw new BomCircularReferenceException();
-        }
+        $componentItemId = $data['component_item_id']
+            ?? $component->component_item_id;
+
+        $this->assertComponentIsValid(
+            $component->bom,
+            (int) $componentItemId,
+            $component->id
+        );
 
         $component->update($data);
 
@@ -100,5 +98,68 @@ class ItemBomService
         ItemBomComponent $component
     ): void {
         $component->delete();
+    }
+
+    private function assertComponentIsValid(
+        ItemBom $bom,
+        int $componentItemId,
+        ?int $excludeComponentId = null
+    ): void {
+        if ($componentItemId === (int) $bom->item_id) {
+            throw new BomCircularReferenceException();
+        }
+
+        $duplicateExists = $bom->components()
+            ->where('component_item_id', $componentItemId)
+            ->when(
+                $excludeComponentId !== null,
+                fn ($query) => $query->whereKeyNot($excludeComponentId)
+            )
+            ->exists();
+
+        if ($duplicateExists) {
+            throw new \InvalidArgumentException('This component already exists on the BOM.');
+        }
+
+        $this->assertNoCircularReference($bom, $componentItemId);
+    }
+
+    private function assertNoCircularReference(
+        ItemBom $bom,
+        int $componentItemId
+    ): void {
+        $visited = [];
+        $stack = [$componentItemId];
+
+        while ($stack !== []) {
+            $currentId = array_pop($stack);
+
+            if (in_array($currentId, $visited, true)) {
+                continue;
+            }
+
+            $visited[] = $currentId;
+
+            $next = ItemBom::query()
+                ->where('item_id', $currentId)
+                ->with('components.componentItem')
+                ->first();
+
+            if ($next === null) {
+                continue;
+            }
+
+            foreach ($next->components as $component) {
+                $childId = (int) $component->component_item_id;
+
+                if ($childId === (int) $bom->item_id) {
+                    throw new BomCircularReferenceException();
+                }
+
+                if ($childId !== $currentId && ! in_array($childId, $visited, true)) {
+                    $stack[] = $childId;
+                }
+            }
+        }
     }
 }

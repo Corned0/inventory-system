@@ -19,13 +19,15 @@ class InventorySerialResource extends JsonResource
             'item_id' => $this->item_id,
             'serial_number' => $this->serial_number,
             'status' => $this->status,
+            'current_warehouse_id' => $this->current_warehouse_id,
+            'current_location_id' => $this->current_location_id,
 
             'item' => new ItemResource(
                 $this->whenLoaded('item')
             ),
 
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

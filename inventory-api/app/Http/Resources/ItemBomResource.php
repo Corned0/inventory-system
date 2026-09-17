@@ -16,12 +16,13 @@ class ItemBomResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'item_id' => $this->item_id,
 
             'item' => $this->whenLoaded(
                 'item',
                 fn () => [
                     'id' => $this->item->id,
-                    'code' => $this->item->code,
+                    'item_code' => $this->item->item_code,
                     'name' => $this->item->name,
                 ]
             ),

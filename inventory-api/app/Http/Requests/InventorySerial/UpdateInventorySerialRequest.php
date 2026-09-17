@@ -24,14 +24,11 @@ class UpdateInventorySerialRequest extends FormRequest
      */
     public function rules(): array
     {
-
-        $serial = $this->route('inventory_serial');
+        $serial = $this->route('inventorySerial') ?? $this->route('inventory_serial');
 
         return [
             'item_id' => [
-                'sometimes',
-                'integer',
-                'exists:items,id',
+                'prohibited',
             ],
 
             'serial_number' => [
@@ -40,11 +37,25 @@ class UpdateInventorySerialRequest extends FormRequest
                 'max:100',
                 'alpha_dash',
                 Rule::unique('inventory_serials', 'serial_number')
-                    ->ignore($serial->id),
+                    ->ignore($serial?->id),
             ],
 
             'status' => [
                'prohibited',
+            ],
+
+            'current_warehouse_id' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:warehouses,id',
+            ],
+
+            'current_location_id' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:locations,id',
             ],
         ];
     }

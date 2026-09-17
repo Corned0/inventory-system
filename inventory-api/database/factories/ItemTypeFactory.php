@@ -22,11 +22,7 @@ class ItemTypeFactory extends Factory
             'code' => fake()->unique()->bothify('TYPE-###'),
             'name' => fake()->words(2, true),
             'description' => fake()->optional()->sentence(),
-            'tracking_type' => fake()->randomElement([
-                'none',
-                'lot',
-                'serial',
-            ]),
+            'tracking_type' => 'none',
             'is_asset' => fake()->boolean(),
             'is_composite' => fake()->boolean(),
             'is_active' => true,

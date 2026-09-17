@@ -3,9 +3,11 @@
 namespace App\Http\Requests\InventoryTransaction;
 
 use App\Enums\InventoryTransactionType;
+use App\Services\Inventory\InventoryTrackingService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use InvalidArgumentException;
 
 class StoreInventoryTransactionRequest extends FormRequest
 {
@@ -94,6 +96,42 @@ class StoreInventoryTransactionRequest extends FormRequest
                 'string',
                 'max:1000',
             ],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function ($validator): void {
+                $itemId = $this->input('item_id');
+                $lotId = $this->input('lot_id');
+                $serialId = $this->input('serial_id');
+                $warehouseId = $this->input('warehouse_id');
+                $locationId = $this->input('location_id');
+
+                if ($itemId === null) {
+                    return;
+                }
+
+                $item = \App\Models\Item::query()->with('itemType')->find($itemId);
+
+                if ($item === null) {
+                    return;
+                }
+
+                try {
+                    app(InventoryTrackingService::class)->validateForTransaction(
+                        item: $item,
+                        lotId: $lotId !== null ? (int) $lotId : null,
+                        serialId: $serialId !== null ? (int) $serialId : null,
+                        quantity: $this->input('quantity'),
+                        warehouseId: $warehouseId !== null ? (int) $warehouseId : null,
+                        locationId: $locationId !== null ? (int) $locationId : null,
+                    );
+                } catch (InvalidArgumentException $exception) {
+                    $validator->errors()->add('tracking', $exception->getMessage());
+                }
+            },
         ];
     }
 }

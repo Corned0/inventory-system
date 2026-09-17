@@ -24,18 +24,16 @@ class UpdateInventoryLotRequest extends FormRequest
      */
     public function rules(): array
     {
-        $lot = $this->route('inventory_lot');
+        $lot = $this->route('inventoryLot') ?? $this->route('inventory_lot');
 
         $itemId = $this->input(
             'item_id',
-            $lot->item_id
+            $lot?->item_id
         );
 
         return [
             'item_id' => [
-                'sometimes',
-                'integer',
-                'exists:items,id',
+                'prohibited',
             ],
 
             'lot_number' => [

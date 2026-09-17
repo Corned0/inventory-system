@@ -29,7 +29,7 @@ it('updates a lot number', function () {
         ->assertJsonPath('data.lot_number', 'LOT-002');
 });
 
-it('updates the item', function () {
+it('prevents changing the lot item', function () {
     $lot = InventoryLot::factory()->create();
 
     $item = Item::factory()->create();
@@ -40,8 +40,8 @@ it('updates the item', function () {
             'item_id' => $item->id,
         ]
     )
-        ->assertOk()
-        ->assertJsonPath('data.item_id', $item->id);
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('item_id');
 });
 
 it('updates manufacturing and expiration dates', function () {

@@ -30,7 +30,7 @@ it('updates serial number', function () {
         ->assertJsonPath('data.serial_number', 'SN-002');
 });
 
-it('updates item', function () {
+it('prevents changing the serial item', function () {
     $serial = InventorySerial::factory()->create();
 
     $item = Item::factory()->create();
@@ -41,8 +41,8 @@ it('updates item', function () {
             'item_id' => $item->id,
         ]
     )
-        ->assertOk()
-        ->assertJsonPath('data.item_id', $item->id);
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('item_id');
 });
 
 it('allows keeping existing serial number', function () {
