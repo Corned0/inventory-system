@@ -33,7 +33,9 @@ class UpdateInventoryLotRequest extends FormRequest
 
         return [
             'item_id' => [
-                'prohibited',
+                'sometimes',
+                'integer',
+                'exists:items,id',
             ],
 
             'lot_number' => [
@@ -48,7 +50,7 @@ class UpdateInventoryLotRequest extends FormRequest
                             $itemId
                         )
                     )
-                    ->ignore($lot->id),
+                    ->ignore($lot?->id),
             ],
 
             'manufactured_date' => [

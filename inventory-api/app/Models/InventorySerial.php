@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\InventorySerialStatus;
+use App\Exceptions\InventorySerialItemChangeException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,25 @@ class InventorySerial extends Model
         'current_warehouse_id',
         'current_location_id',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $serial): void {
+            if ($serial->isDirty('item_id')) {
+                $hasReferences = $serial->transactions()->exists() || $serial->assetInstances()->exists();
+
+                if ($hasReferences) {
+                    throw new InventorySerialItemChangeException();
+                }
+            }
+        });
+
+        static::deleting(function (self $serial): void {
+            if ($serial->transactions()->exists() || $serial->assetInstances()->exists()) {
+                throw new \RuntimeException('The serial cannot be deleted because it is referenced by inventory records.');
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -44,5 +64,10 @@ class InventorySerial extends Model
     public function transactions()
     {
         return $this->hasMany(InventoryTransaction::class, 'serial_id');
+    }
+
+    public function assetInstances()
+    {
+        return $this->hasMany(AssetInstance::class, 'serial_number', 'serial_number');
     }
 }

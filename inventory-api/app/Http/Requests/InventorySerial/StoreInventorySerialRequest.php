@@ -44,8 +44,7 @@ class StoreInventorySerialRequest extends FormRequest
             ],
 
             'status' => [
-                'nullable',
-                'string',
+                'prohibited',
             ],
 
             'current_warehouse_id' => [

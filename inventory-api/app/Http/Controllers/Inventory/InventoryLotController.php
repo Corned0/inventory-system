@@ -71,4 +71,14 @@ class InventoryLotController extends Controller
             'message' => 'Inventory lot updated successfully.',
         ]);
     }
+
+    public function destroy(
+        InventoryLot $inventoryLot
+    ): JsonResponse {
+        $inventoryLot->delete();
+
+        return response()->json([
+            'message' => 'Inventory lot deleted successfully.',
+        ]);
+    }
 }

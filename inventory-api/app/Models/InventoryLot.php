@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Exceptions\InventoryLotDateRangeException;
+use App\Exceptions\InventoryLotDeleteException;
+use App\Exceptions\InventoryLotItemChangeException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +20,33 @@ class InventoryLot extends Model
         'manufactured_date',
         'expiration_date',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $lot): void {
+            if ($lot->isDirty('item_id')) {
+                $hasReferences = $lot->transactions()->exists() || $lot->balances()->exists();
+
+                if ($hasReferences) {
+                    throw new InventoryLotItemChangeException();
+                }
+            }
+
+            if (
+                $lot->manufactured_date !== null
+                && $lot->expiration_date !== null
+                && $lot->expiration_date->lt($lot->manufactured_date)
+            ) {
+                throw new InventoryLotDateRangeException();
+            }
+        });
+
+        static::deleting(function (self $lot): void {
+            if ($lot->transactions()->exists() || $lot->balances()->exists()) {
+                throw new InventoryLotDeleteException();
+            }
+        });
+    }
 
     public function transactions()
     {

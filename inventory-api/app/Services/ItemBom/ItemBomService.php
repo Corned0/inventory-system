@@ -16,7 +16,14 @@ class ItemBomService
         array $data
     ): ItemBom {
         return DB::transaction(function () use ($item, $data): ItemBom {
+            $this->assertItemIsComposite($item);
+
             $isActive = $data['is_active'] ?? true;
+            $version = (int) $data['version'];
+
+            if ($item->boms()->where('version', $version)->exists()) {
+                throw new \InvalidArgumentException('A BOM version already exists for this item.');
+            }
 
             if (
                 $isActive &&
@@ -30,7 +37,7 @@ class ItemBomService
             return ItemBom::create([
                 'item_id' => $item->id,
                 'name' => $data['name'],
-                'version' => $data['version'],
+                'version' => $version,
                 'is_active' => $isActive,
             ]);
         });
@@ -41,8 +48,15 @@ class ItemBomService
         array $data
     ): ItemBom {
         return DB::transaction(function () use ($bom, $data): ItemBom {
-            $isActive = $data['is_active']
-                ?? $bom->is_active;
+            $isActive = $data['is_active'] ?? $bom->is_active;
+
+            if (isset($data['version'])) {
+                $version = (int) $data['version'];
+
+                if ($bom->item->boms()->where('version', $version)->whereKeyNot($bom->id)->exists()) {
+                    throw new \InvalidArgumentException('A BOM version already exists for this item.');
+                }
+            }
 
             if (
                 $isActive &&
@@ -98,6 +112,13 @@ class ItemBomService
         ItemBomComponent $component
     ): void {
         $component->delete();
+    }
+
+    private function assertItemIsComposite(Item $item): void
+    {
+        if (! (bool) $item->itemType?->is_composite) {
+            throw new \InvalidArgumentException('Only composite items can have BOMs.');
+        }
     }
 
     private function assertComponentIsValid(

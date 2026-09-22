@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Item;
 use App\Models\ItemBom;
+use App\Models\ItemType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,7 +17,11 @@ class ItemBomFactory extends Factory
     public function definition(): array
     {
         return [
-            'item_id' => Item::factory(),
+            'item_id' => Item::factory()->state([
+                'item_type_id' => ItemType::factory()->create([
+                    'is_composite' => true,
+                ])->id,
+            ]),
             'name' => 'BOM v1',
             'version' => 1,
             'is_active' => true,

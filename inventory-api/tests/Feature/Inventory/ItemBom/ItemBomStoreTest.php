@@ -3,6 +3,7 @@
 use App\Exceptions\ActiveBomExistsException;
 use App\Models\Item;
 use App\Models\ItemBom;
+use App\Models\ItemType;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,8 +18,17 @@ beforeEach(function () {
     $this->actingAsAdmin();
 });
 
+function makeCompositeItem(): Item
+{
+    return Item::factory()->create([
+        'item_type_id' => ItemType::factory()->create([
+            'is_composite' => true,
+        ])->id,
+    ]);
+}
+
 it('creates a BOM', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     $response = $this->postJson(
         route('item-boms.store', $item),
@@ -39,7 +49,7 @@ it('creates a BOM', function () {
 });
 
 it('defaults BOM to active', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     $this->postJson(
         route('item-boms.store', $item),
@@ -53,7 +63,7 @@ it('defaults BOM to active', function () {
 });
 
 it('allows creating an inactive BOM', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     $this->postJson(
         route('item-boms.store', $item),
@@ -68,7 +78,7 @@ it('allows creating an inactive BOM', function () {
 });
 
 it('requires a BOM name', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     $this->postJson(
         route('item-boms.store', $item),
@@ -81,7 +91,7 @@ it('requires a BOM name', function () {
 });
 
 it('requires a BOM version', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     $this->postJson(
         route('item-boms.store', $item),
@@ -94,7 +104,7 @@ it('requires a BOM version', function () {
 });
 
 it('requires a positive BOM version', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     $this->postJson(
         route('item-boms.store', $item),
@@ -108,7 +118,7 @@ it('requires a positive BOM version', function () {
 });
 
 it('does not allow duplicate BOM versions for an item', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     ItemBom::factory()->create([
         'item_id' => $item->id,
@@ -128,8 +138,8 @@ it('does not allow duplicate BOM versions for an item', function () {
 });
 
 it('allows the same BOM version for different items', function () {
-    $itemA = Item::factory()->create();
-    $itemB = Item::factory()->create();
+    $itemA = makeCompositeItem();
+    $itemB = makeCompositeItem();
 
     $this->postJson(
         route('item-boms.store', $itemA),
@@ -151,7 +161,7 @@ it('allows the same BOM version for different items', function () {
 });
 
 it('does not allow multiple active BOMs for the same item', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     ItemBom::factory()->create([
         'item_id' => $item->id,
@@ -171,7 +181,7 @@ it('does not allow multiple active BOMs for the same item', function () {
 });
 
 it('allows multiple inactive BOMs for the same item', function () {
-    $item = Item::factory()->create();
+    $item = makeCompositeItem();
 
     ItemBom::factory()->create([
         'item_id' => $item->id,
@@ -188,4 +198,21 @@ it('allows multiple inactive BOMs for the same item', function () {
         ]
     )
         ->assertCreated();
+});
+
+it('rejects creating a BOM for a non-composite item', function () {
+    $item = Item::factory()->create([
+        'item_type_id' => ItemType::factory()->create([
+            'is_composite' => false,
+        ])->id,
+    ]);
+
+    $this->postJson(
+        route('item-boms.store', $item),
+        [
+            'name' => 'Not allowed',
+            'version' => 1,
+        ]
+    )
+        ->assertStatus(500);
 });

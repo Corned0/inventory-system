@@ -30,8 +30,6 @@ class InventoryTrackingService
             if ($serialId !== null) {
                 throw new InvalidArgumentException('Serial tracking is not allowed for this item.');
             }
-
-            return;
         }
 
         if ($trackingType === 'lot') {
@@ -48,8 +46,6 @@ class InventoryTrackingService
             if ($lot === null || (int) $lot->item_id !== (int) $item->id) {
                 throw new InvalidArgumentException('The provided lot does not belong to the item.');
             }
-
-            return;
         }
 
         if ($trackingType === 'serial') {
@@ -74,15 +70,8 @@ class InventoryTrackingService
             }
         }
 
-        if ($warehouseId !== null && $locationId !== null) {
-            $belongsToWarehouse = DB::table('locations')
-                ->where('id', $locationId)
-                ->where('warehouse_id', $warehouseId)
-                ->exists();
-
-            if (! $belongsToWarehouse) {
-                throw new InvalidArgumentException('The selected location does not belong to the warehouse.');
-            }
+        if ($locationId !== null) {
+            $this->validateLocationWarehouse($warehouseId, $locationId);
         }
     }
 
