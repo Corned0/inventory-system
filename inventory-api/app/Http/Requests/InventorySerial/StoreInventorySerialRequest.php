@@ -36,11 +36,7 @@ class StoreInventorySerialRequest extends FormRequest
                 'string',
                 'max:100',
                 'alpha_dash',
-                Rule::unique('inventory_serials', 'serial_number')
-                    ->where(fn ($query) => $query->where(
-                        'item_id',
-                        $this->input('item_id')
-                    )),
+                Rule::unique('inventory_serials', 'serial_number'),
             ],
 
             'status' => [

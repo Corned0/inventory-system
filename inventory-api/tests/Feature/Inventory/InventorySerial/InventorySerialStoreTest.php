@@ -121,9 +121,6 @@ it('rejects status during creation', function () {
             'status' => InventorySerialStatus::Disposed->value,
         ]
     )
-        ->assertCreated()
-        ->assertJsonPath(
-            'data.status',
-            InventorySerialStatus::Available->value
-        );
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
 });

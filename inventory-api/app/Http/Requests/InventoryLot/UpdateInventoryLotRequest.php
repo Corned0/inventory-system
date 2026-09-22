@@ -33,9 +33,7 @@ class UpdateInventoryLotRequest extends FormRequest
 
         return [
             'item_id' => [
-                'sometimes',
-                'integer',
-                'exists:items,id',
+                'prohibited',
             ],
 
             'lot_number' => [

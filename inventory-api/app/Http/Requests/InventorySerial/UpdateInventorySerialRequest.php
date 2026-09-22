@@ -37,12 +37,6 @@ class UpdateInventorySerialRequest extends FormRequest
                 'max:100',
                 'alpha_dash',
                 Rule::unique('inventory_serials', 'serial_number')
-                    ->where(
-                        fn ($query) => $query->where(
-                            'item_id',
-                            $serial?->item_id ?? $this->input('item_id')
-                        )
-                    )
                     ->ignore($serial?->id),
             ],
 
